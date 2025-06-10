@@ -1,5 +1,5 @@
+using Auth.Application.Commands;
 using Auth.Application.Interfaces;
-using Auth.Application.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

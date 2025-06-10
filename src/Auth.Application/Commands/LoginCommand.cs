@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Auth.Application.Models;
+namespace Auth.Application.Commands;
 
 public class LoginCommand : IRequest<bool>
 {
