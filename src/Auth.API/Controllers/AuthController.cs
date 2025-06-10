@@ -17,14 +17,14 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(LoginRequest request)
+    public async Task<IActionResult> Register(LoginCommand request)
     {
         var result = await _authService.RegisterAsync(request.Username, request.Password);
         return result ? Ok("Registered") : BadRequest("User already exists");
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginRequest request)
+    public async Task<IActionResult> Login(LoginCommand request)
     {
         var token = await _authService.AuthenticateAsync(request.Username, request.Password);
         if (token == null) return Unauthorized();
