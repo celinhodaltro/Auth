@@ -1,4 +1,5 @@
 using Auth.Application.Interfaces;
+using Auth.Infrastructure.Repositories;
 using Auth.Infrastructure.Services;
 using Core.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -6,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Vinculo.Infrastructure.Persistence;
-using Vinculo.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
