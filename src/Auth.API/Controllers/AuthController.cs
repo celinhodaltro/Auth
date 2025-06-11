@@ -1,5 +1,6 @@
 using Auth.Application.Commands;
 using Auth.Application.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,25 +11,22 @@ namespace Auth.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-
+    private readonly IMediator _mediator;
     public AuthController(IAuthService authService)
     {
         _authService = authService;
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> Register(LoginCommand request)
-    {
-        var result = await _authService.RegisterAsync(request.Username, request.Password);
-        return result ? Ok("Registered") : BadRequest("User already exists");
-    }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginCommand request)
     {
-        var token = await _authService.AuthenticateAsync(request.Username, request.Password);
-        if (token == null) return Unauthorized();
-        return Ok(new { Token = token });
+        bool isAuthenticated = await _mediator.Send(request);
+
+        if (!isAuthenticated) 
+            return Unauthorized();
+
+        return Ok(new { isAuthenticated });
     }
 
     [HttpGet("me")]
