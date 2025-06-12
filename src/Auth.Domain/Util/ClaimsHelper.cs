@@ -1,8 +1,10 @@
 ﻿using Auth.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Server.Entities;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
@@ -12,35 +14,26 @@ namespace Auth.Domain.Util
 
     public static class ClaimsHelper
     {
-        public static UserToken BuildToken(this IConfiguration configuration, User user)
+        public static string GenerateToken<T>(T obj, string secretKey, int expireMinutes = 60, string app = "")
         {
-            Claim[] claims = new[]
+            var jsonPayload = JsonConvert.SerializeObject(obj);
+
+            var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
-                new Claim("AppMain", "UrsullaOnline.com.br"),
-                new Claim("UserId", user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Aud, configuration["Jwt:Audience"]),
-                new Claim(JwtRegisteredClaimNames.Iss, configuration["Jwt:Issuer"]),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim("data", jsonPayload)
             };
 
-            DateTime expiration = DateTime.UtcNow.AddHours(2);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:key"]));
-            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            JwtSecurityToken token = new JwtSecurityToken(
-                issuer: null,
-                audience: null,
+            var token = new JwtSecurityToken(
+                issuer: app,
+                audience: app,
                 claims: claims,
-                expires: expiration,
+                expires: DateTime.UtcNow.AddMinutes(expireMinutes),
                 signingCredentials: creds);
 
-            return new UserToken()
-            {
-                Token = new JwtSecurityTokenHandler().WriteToken(token),
-                Expiration = expiration
-            };
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
