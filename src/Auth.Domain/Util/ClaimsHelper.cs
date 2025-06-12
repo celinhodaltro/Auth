@@ -20,7 +20,7 @@ namespace Auth.Domain.Util
 
             var claims = new[]
             {
-            new Claim("data", jsonPayload)
+                new Claim("data", jsonPayload)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
